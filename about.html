@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - ML Ensemble Methods</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --accent-color: #0284c7;
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #16a34a;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: var(--accent-color);
+            margin: 0 0 5px 0;
+        }
+        .panel {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        h2 {
+            color: var(--text-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-top: 30px;
+        }
+        h2:first-of-type {
+            margin-top: 0;
+        }
+        h3 {
+            color: var(--accent-color);
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+        p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 1.05rem;
+            margin-bottom: 15px;
+        }
+        ul {
+            padding-left: 20px;
+            color: var(--text-color);
+        }
+        li {
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        strong {
+            color: var(--text-color);
+        }
+        .highlight-box {
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 15px 0;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 1rem;
+        }
+        .comparison-table th, .comparison-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+        .comparison-table th {
+            background-color: #f1f5f9;
+            color: var(--text-color);
+            font-weight: bold;
+        }
+        .comparison-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        .footer-nav {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .action-btn {
+            background-color: #1e293b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .action-btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Understanding Ensemble Methods</h1>
+            <p>A comprehensive guide to Bagging, Boosting, and their architectural mechanics.</p>
+        </header>
+
+        <div class="panel">
+            <h2>Basic Concepts</h2>
+            <p>In machine learning, <strong>Ensemble Methods</strong> combine the predictions of multiple base models (often called weak learners) to create a single, more robust, and highly accurate predictive model. Instead of relying on one decision configuration, ensembling aggregates diverse perspectives to minimize systemic errors.</p>
+            
+            <div class="highlight-box">
+                <p>The two most prominent frameworks under ensemble learning are <strong>Bagging</strong> and <strong>Boosting</strong>. While both rely on combining multiple decision paths, they build and organize their base models using completely fundamentally opposite strategies.</p>
+            </div>
+
+            <h2>What is Bagging?</h2>
+            <p>Bagging, short for <strong>Bootstrap Aggregating</strong>, focuses on reducing a model's variance. It optimizes stability by training multiple independent models completely in parallel across randomly sampled variations of the original training set.</p>
+            
+            <h3>Core Mechanism</h3>
+            <ul>
+                <li><strong>Bootstrapping:</strong> The original training dataset is sampled randomly with replacement to create multiple subsets of equal size. This means some individual rows will repeat in a single subset, while others might be excluded entirely.</li>
+                <li><strong>Parallel Training:</strong> An individual base estimator (typically an unpruned, high-variance Decision Tree) is assigned to each bootstrapped subset. All models are fitted simultaneously and independently.</li>
+                <li><strong>Aggregation:</strong> When making a new prediction, the ensemble aggregates all outputs. For classification tasks, it uses a majority vote consensus. For regression tasks, it takes the average configuration score.</li>
+            </ul>
+
+            <h3>Key Types of Bagging</h3>
+            <ul>
+                <li><strong>Random Forest:</strong> Extends bagging by introducing feature randomness. In addition to sampling rows randomly, it only evaluates a random subset of columns (features) at each tree split, ensuring maximum structural diversity.</li>
+                <li><strong>Standard Bagging Meta-Estimators:</strong> Applies the exact bootstrapping wrapper framework across non-tree models, such as K-Nearest Neighbors or Support Vector Machines.</li>
+            </ul>
+
+            <h2>What is Boosting?</h2>
+            <p>Boosting is a sequential ensemble technique designed to reduce bias. Instead of running estimators independently, boosting builds models consecutively, meaning each new model explicitly learns from and corrects the mistakes made by its direct predecessors.</p>
+            
+            <h3>Core Mechanism</h3>
+            <ul>
+                <li><strong>Sequential Iteration:</strong> Models are trained one after another. Model 1 runs on the initial data profile and establishes a baseline prediction layout.</li>
+                <li><strong>Error Focus Adjustments:</strong> The system identifies data points where Model 1 made incorrect assumptions. It alters the environment so that subsequent steps focus strictly on resolving those specific errors.</li>
+                <li><strong>Weighted Aggregation:</strong> Unlike the uniform voting found in bagging, boosting combines models by giving higher voting weights to the base learners that demonstrated superior performance during training cycles.</li>
+            </ul>
+
+            <h3>Key Types of Boosting</h3>
+            <ul>
+                <li><strong>AdaBoost (Adaptive Boosting):</strong> Modifies the ensemble landscape by scaling up the sample weights of misclassified rows. The next base model (usually a weak, single-split tree called a Decision Stump) is forced to prioritize the scaled-up points.</li>
+                <li><strong>Gradient Boosting:</strong> Instead of tweaking sample data row weights directly, it builds consecutive trees to explicitly predict the residual errors (gradients) left behind by previous models, constantly optimizing a targeted loss function.</li>
+                <li><strong>XGBoost (Extreme Gradient Boosting):</strong> An advanced, highly optimized engineering implementation of gradient boosting that incorporates built-in regularizations, tree pruning systems, and parallel processing architecture to optimize scaling speeds.</li>
+            </ul>
+
+            <h2>Key Structural Differences</h2>
+            <p>The table below highlights the operational boundaries that separate the two frameworks:</p>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature Dimension</th>
+                        <th>Bagging Framework</th>
+                        <th>Boosting Framework</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Execution Design</strong></td>
+                        <td>Parallel (Estimators run independently)</td>
+                        <td>Sequential (Estimators learn step-by-step)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Primary Optimization</strong></td>
+                        <td>Reduces Variance (Prevents Overfitting)</td>
+                        <td>Reduces Bias (Corrects Underfitting)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data Sampling</strong></td>
+                        <td>Random Bootstrap with replacement</td>
+                        <td>Dynamic weighting based on preceding error profiles</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Base Learner Types</strong></td>
+                        <td>Complex, deep models (High variance)</td>
+                        <td>Simple, shallow models (High bias weak learners)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Final Output Rule</strong></td>
+                        <td>Equal-weight voting or simple average</td>
+                        <td>Weighted combination based on individual model accuracy</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer-nav">
+            <button class="action-btn" id="back-btn">Back to Home</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('back-btn').onclick = function() {
+            window.location.href = 'https://harish040805.github.io/mlensemblemethods/';
+        };
+    </script>
+</body>
+</html>
