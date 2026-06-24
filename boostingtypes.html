@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boosting Simulators (Simplified)</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --accent-color: #0284c7;
+            --text-color: #1e293b;
+            --border-color: #e2e8f0;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        h1 {
+            color: var(--accent-color);
+            margin: 0 0 5px 0;
+        }
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            background-color: #cbd5e1;
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        .panel {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            display: none;
+        }
+        .panel.active {
+            display: block;
+        }
+        .arena {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .display-box {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            min-height: 100px;
+            width: 100%;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .item {
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.4s ease;
+        }
+        .item.ada {
+            background-color: #ef4444;
+            color: white;
+        }
+        .item.grow {
+            transform: scale(1.6);
+            box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
+        }
+        .item.xg {
+            background-color: #3b82f6;
+            color: white;
+            position: relative;
+        }
+        .error-bar {
+            width: 100px;
+            height: 12px;
+            background-color: #cbd5e1;
+            border-radius: 6px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .error-fill {
+            width: 100%;
+            height: 100%;
+            background-color: #ef4444;
+            transition: width 0.5s ease;
+        }
+        .action-btn {
+            background-color: #1e293b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        .status-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+            min-height: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Boosting Simulators (Simplified)</h1>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" id="tab-ada-btn">AdaBoost Simulation</button>
+            <button class="tab-btn" id="tab-xg-btn">XGBoost Simulation</button>
+        </div>
+
+        <div id="ada-panel" class="panel active">
+            <p style="text-align: center; color: #64748b;"><strong>Concept:</strong> Misclassified items grow larger to force the next model to focus on them.</p>
+            <div class="arena">
+                <div class="display-box">
+                    <div class="item ada" id="ada-item">Wrong Answer Item</div>
+                </div>
+                <button class="action-btn" id="ada-btn">Click to Fix Mistake</button>
+                <div class="status-text" id="ada-status">Model 1 got this item wrong.</div>
+            </div>
+        </div>
+
+        <div id="xg-panel" class="panel">
+            <p style="text-align: center; color: #64748b;"><strong>Concept:</strong> Measures the exact remaining error gap and builds a tree to shrink it to zero.</p>
+            <div class="arena">
+                <div class="display-box">
+                    <div class="item xg">
+                        Prediction Goal
+                        <div class="error-bar"><div class="error-fill" id="xg-fill"></div></div>
+                    </div>
+                </div>
+                <button class="action-btn" id="xg-btn">Click to Correct Error</button>
+                <div class="status-text" id="xg-status">Error Gap is currently at 100%.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tabAdaBtn = document.getElementById('tab-ada-btn');
+        const tabXgBtn = document.getElementById('tab-xg-btn');
+        const adaPanel = document.getElementById('ada-panel');
+        const xgPanel = document.getElementById('xg-panel');
+        const adaItem = document.getElementById('ada-item');
+        const adaStatus = document.getElementById('ada-status');
+        const adaBtn = document.getElementById('ada-btn');
+        const xgFill = document.getElementById('xg-fill');
+        const xgStatus = document.getElementById('xg-status');
+        const xgBtn = document.getElementById('xg-btn');
+
+        let adaState = 0;
+        let xgState = 0;
+
+        function switchTab(tab) {
+            tabAdaBtn.classList.remove('active');
+            tabXgBtn.classList.remove('active');
+            adaPanel.classList.remove('active');
+            xgPanel.classList.remove('active');
+            
+            if(tab === 'ada') {
+                tabAdaBtn.classList.add('active');
+                adaPanel.classList.add('active');
+            } else {
+                tabXgBtn.classList.add('active');
+                xgPanel.classList.add('active');
+            }
+            resetSims();
+        }
+
+        function stepAda() {
+            if(adaState === 0) {
+                adaItem.classList.add('grow');
+                adaStatus.innerText = 'AdaBoost scaled up its weight! It is now huge.';
+                adaBtn.innerText = 'Train Model 2 on Big Item';
+                adaState = 1;
+            } else {
+                adaItem.classList.remove('grow');
+                adaItem.style.backgroundColor = '#16a34a';
+                adaItem.innerText = 'Correct Answer Item';
+                adaStatus.innerText = 'Model 2 focused on the large item and fixed it!';
+                adaStatus.style.color = '#16a34a';
+                adaBtn.disabled = true;
+            }
+        }
+
+        function stepXG() {
+            if(xgState === 0) {
+                xgFill.style.width = '40%';
+                xgStatus.innerText = 'Tree 1 computed the gradient gap and shrank the error down to 40%.';
+                xgBtn.innerText = 'Run Final Tree Correction';
+                xgState = 1;
+            } else {
+                xgFill.style.width = '0%';
+                xgStatus.innerText = 'Tree 2 closed the remaining residual gap! Error is now 0%.';
+                xgStatus.style.color = '#16a34a';
+                xgBtn.disabled = true;
+            }
+        }
+
+        function resetSims() {
+            adaState = 0;
+            xgState = 0;
+            
+            adaItem.className = 'item ada';
+            adaItem.style.backgroundColor = '#ef4444';
+            adaItem.innerText = 'Wrong Answer Item';
+            adaStatus.innerText = 'Model 1 got this item wrong.';
+            adaStatus.style.color = '#1e293b';
+            adaBtn.innerText = 'Click to Fix Mistake';
+            adaBtn.disabled = false;
+
+            xgFill.style.width = '100%';
+            xgStatus.innerText = 'Error Gap is currently at 100%.';
+            xgStatus.style.color = '#1e293b';
+            xgBtn.innerText = 'Click to Correct Error';
+            xgBtn.disabled = false;
+        }
+
+        tabAdaBtn.onclick = function() { switchTab('ada'); };
+        tabXgBtn.onclick = function() { switchTab('xg'); };
+        adaBtn.onclick = stepAda;
+        xgBtn.onclick = stepXG;
+    </script>
+</body>
+</html>

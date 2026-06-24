@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ensemble Methods Simplified</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --accent-color: #0284c7;
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --blue-item: #3b82f6;
+            --red-item: #ef4444;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: var(--accent-color);
+            margin-bottom: 5px;
+        }
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        .tab-btn {
+            background-color: #cbd5e1;
+            color: var(--text-color);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        .panel {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            display: none;
+        }
+        .panel.active {
+            display: block;
+        }
+        .analogy-box {
+            background-color: #f1f5f9;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+        .visual-arena {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin: 25px 0;
+        }
+        .item-pool {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            min-height: 50px;
+            width: 80%;
+        }
+        .ball {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .ball.blue { background-color: var(--blue-item); }
+        .ball.red { background-color: var(--red-item); }
+        .ball.large { transform: scale(1.4); box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+        .interactive-section {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            gap: 15px;
+        }
+        .sub-card {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            flex: 1;
+            transition: all 0.3s;
+        }
+        .sub-card.highlight {
+            border-color: var(--accent-color);
+            background-color: rgba(2, 132, 199, 0.03);
+        }
+        .action-btn {
+            background-color: #1e293b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        .action-btn:hover { opacity: 0.9; }
+        .output-display {
+            margin-top: 25px;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-top: 2px solid var(--border-color);
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Ensemble Methods Made Easy</h1>
+            <p>Switch between tabs to see the clear contrast between Bagging and Boosting.</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('bagging')">Bagging (Parallel)</button>
+            <button class="tab-btn" onclick="switchTab('boosting')">Boosting (Sequential)</button>
+        </div>
+
+        <div id="bagging-panel" class="panel active">
+            <div class="analogy-box">
+                <strong>Bagging Analogy:</strong> Multiple students study different random chapters at the same time, then take a majority vote to get the final answer.
+            </div>
+            <div class="visual-arena">
+                📊 <strong>Original Balanced Dataset:</strong>
+                <div class="item-pool">
+                    <div class="ball blue">B</div><div class="ball blue">B</div><div class="ball red">R</div><div class="ball blue">B</div><div class="ball red">R</div>
+                </div>
+                
+                <div class="interactive-section">
+                    <div class="sub-card" id="bag-learner-1">
+                        <h3>Model 1</h3>
+                        <div class="item-pool" id="bag-pool-1" style="width:auto; min-height:40px;"></div>
+                        <p id="bag-pred-1">Waiting...</p>
+                    </div>
+                    <div class="sub-card" id="bag-learner-2">
+                        <h3>Model 2</h3>
+                        <div class="item-pool" id="bag-pool-2" style="width:auto; min-height:40px;"></div>
+                        <p id="bag-pred-2">Waiting...</p>
+                    </div>
+                    <div class="sub-card" id="bag-learner-3">
+                        <h3>Model 3</h3>
+                        <div class="item-pool" id="bag-pool-3" style="width:auto; min-height:40px;"></div>
+                        <p id="bag-pred-3">Waiting...</p>
+                    </div>
+                </div>
+                
+                <button class="action-btn" id="bag-action" onclick="simulateBagging()">Run Bagging Step</button>
+                <div class="output-display" id="bag-output">Ensemble Vote Output: -</div>
+            </div>
+        </div>
+
+        <div id="boosting-panel" class="panel">
+            <div class="analogy-box">
+                <strong>Boosting Analogy:</strong> One student learns sequentially. If they get a question wrong, that question gets extra focus (grows bigger) in the next round until they fix it.
+            </div>
+            <div class="visual-arena">
+                📊 <strong>Dataset with Dynamic Focus Weights:</strong>
+                <div class="item-pool" id="boost-dataset-pool">
+                    <div class="ball blue" id="bball-1">B</div>
+                    <div class="ball red" id="bball-2">R</div>
+                    <div class="ball blue" id="bball-3">B</div>
+                </div>
+
+                <div class="interactive-section">
+                    <div class="sub-card" id="boost-card-1">
+                        <h3>Round 1</h3>
+                        <p id="boost-txt-1">Trains on all items equally.</p>
+                        <p id="boost-status-1">-</p>
+                    </div>
+                    <div class="sub-card" id="boost-card-2">
+                        <h3>Round 2</h3>
+                        <p id="boost-txt-2">Waiting...</p>
+                        <p id="boost-status-2">-</p>
+                    </div>
+                </div>
+
+                <button class="action-btn" id="boost-action" onclick="simulateBoosting()">Run Next Sequential Round</button>
+                <div class="output-display" id="boost-output">Final Correction Model status: -</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(type) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            
+            if(type === 'bagging') {
+                document.querySelector('.tabs .tab-btn:nth-child(1)').classList.add('active');
+                document.getElementById('bagging-panel').classList.add('active');
+            } else {
+                document.querySelector('.tabs .tab-btn:nth-child(2)').classList.add('active');
+                document.getElementById('boosting-panel').classList.add('active');
+            }
+            resetSimulations();
+        }
+
+        let baggingStep = 0;
+        function simulateBagging() {
+            if(baggingStep === 0) {
+                const items = [
+                    {v:'B', c:'blue'}, {v:'B', c:'blue'}, {v:'R', c:'red'}
+                ];
+                
+                for(let m=1; m<=3; m++) {
+                    const pool = document.getElementById(`bag-pool-${m}`);
+                    pool.innerHTML = '';
+                    let blues = 0, reds = 0;
+                    
+                    for(let i=0; i<3; i++) {
+                        const rand = items[Math.floor(Math.random() * items.length)];
+                        const el = document.createElement('div');
+                        el.className = `ball ${rand.c}`;
+                        el.innerText = rand.v;
+                        pool.appendChild(el);
+                        if(rand.v === 'B') blues++; else reds++;
+                    }
+                    const pred = blues >= reds ? 'Blue' : 'Red';
+                    document.getElementById(`bag-pred-${m}`).innerText = `Predicts: ${pred}`;
+                    document.getElementById(`bag-pred-${m}`).style.color = blues >= reds ? '#2563eb' : '#dc2626';
+                }
+                
+                document.getElementById('bag-action').innerText = 'Compute Voting Result';
+                baggingStep = 1;
+            } else {
+                document.getElementById('bag-output').innerText = 'Ensemble Vote Output: Blue Wins (Majority Rule Consensus)';
+                document.getElementById('bag-output').style.color = '#16a34a';
+                document.getElementById('bag-action').disabled = true;
+            }
+        }
+
+        let boostingStep = 0;
+        function simulateBoosting() {
+            if(boostingStep === 0) {
+                document.getElementById('boost-card-1').classList.add('highlight');
+                document.getElementById('boost-status-1').innerText = '❌ Missed Red Item!';
+                document.getElementById('boost-status-1').style.color = '#dc2626';
+                
+                document.getElementById('bball-2').classList.add('large');
+                
+                document.getElementById('boost-txt-2').innerText = 'Focuses on the magnified Red Item.';
+                document.getElementById('boost-action').innerText = 'Finish Sequential Optimization';
+                boostingStep = 1;
+            } else {
+                document.getElementById('boost-card-1').classList.remove('highlight');
+                document.getElementById('boost-card-2').classList.add('highlight');
+                document.getElementById('boost-status-2').innerText = '✅ Fixed Red Item Error!';
+                document.getElementById('boost-status-2').style.color = '#16a34a';
+                
+                document.getElementById('boost-output').innerText = 'Final Status: Errors eliminated sequentially.';
+                document.getElementById('boost-output').style.color = '#16a34a';
+                document.getElementById('boost-action').disabled = true;
+            }
+        }
+
+        function resetSimulations() {
+            baggingStep = 0;
+            boostingStep = 0;
+            
+            document.getElementById('bag-action').disabled = false;
+            document.getElementById('bag-action').innerText = 'Run Bagging Step';
+            document.getElementById('bag-output').innerText = 'Ensemble Vote Output: -';
+            document.getElementById('bag-output').style.color = 'var(--text-color)';
+            for(let m=1; m<=3; m++) {
+                document.getElementById(`bag-pool-${m}`).innerHTML = '';
+                document.getElementById(`bag-pred-${m}`).innerText = 'Waiting...';
+                document.getElementById(`bag-pred-${m}`).style.color = 'var(--text-color)';
+            }
+
+            document.getElementById('boost-action').disabled = false;
+            document.getElementById('boost-action').innerText = 'Run Next Sequential Round';
+            document.getElementById('boost-output').innerText = 'Final Status: -';
+            document.getElementById('boost-output').style.color = 'var(--text-color)';
+            document.getElementById('bball-2').classList.remove('large');
+            document.getElementById('boost-card-1').classList.remove('highlight');
+            document.getElementById('boost-card-2').classList.remove('highlight');
+            document.getElementById('boost-status-1').innerText = '-';
+            document.getElementById('boost-status-2').innerText = '-';
+            document.getElementById('boost-txt-2').innerText = 'Waiting...';
+        }
+    </script>
+</body>
+</html>
